@@ -9,7 +9,9 @@ export const SERVER_SEARCH_URI = `${process.env.SERVER_BASE_URI}/v1/search`;
 export const SERVER_QR_URI = `${process.env.SERVER_BASE_URI}/v1/qrcodelink?device_name=signal-automation`;
 
 export const WEB_URI =
-  process.env.NEXT_PUBLIC_WEB_URL || process.env.VERCEL_BRANCH_URL;
+  process.env.NEXT_PUBLIC_WEB_URL ||
+  process.env.VERCEL_BRANCH_URL ||
+  process.env.VERCEL_URL;
 
 export const MESSAGE_HANDLER_URL = `https://${WEB_URI}/api`;
 export const LINK_HANDLER_URL = `https://${WEB_URI}/link`;

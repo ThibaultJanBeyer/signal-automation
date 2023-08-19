@@ -28,9 +28,13 @@ export async function POST(req: Request) {
   if (auth !== process.env.SERVER_TOKEN)
     return new NextResponse("Missing Auth", { status: 401 });
 
+  const msg = getRandomItemFromArray(body.messages)?.value;
+  const stkr = getRandomItemFromArray(body.stickers)?.value;
+  const att = getRandomItemFromArray(body.attachments)?.value;
   const message = {
-    message: getRandomItemFromArray(body.messages)?.value,
-    sticker: getRandomItemFromArray(body.stickers)?.value,
+    ...(msg ? { message: msg } : {}),
+    ...(stkr ? { sticker: stkr } : {}),
+    ...(att ? { base64_attachments: att } : {}),
     number: userPhoneNumber,
     recipients: body.recipients.map((r) => r.value),
   };
