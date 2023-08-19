@@ -1,0 +1,46 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "start": {},
+    "production": {},
+    "lint": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "migrate": {
+      "cache": false
+    },
+    "generate": {
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    }
+  },
+  "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "SLACK_APP_TOKEN",
+    "SLACK_CLIENT_ID",
+    "SLACK_CLIENT_SECRET",
+    "SLACK_SIGNING_SECRET",
+    "SLACK_CODE",
+    "COMMUNICATION_TOKEN",
+    "NEXTAUTH_SECRET",
+    "DATABASE_URL",
+    "PROTOCOL",
+    "WEB_URI",
+    "BOT_URI",
+    "DOCKERHUB_TOKEN",
+    "DOCKERHUB_USERNAME",
+    "HOST",
+    "USERNAME",
+    "KEY"
+  ]
+}
