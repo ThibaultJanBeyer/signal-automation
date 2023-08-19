@@ -30,6 +30,7 @@ export async function POST(req: Request) {
 
   const message = {
     message: getRandomItemFromArray(body.messages)?.value,
+    sticker: getRandomItemFromArray(body.stickers)?.value,
     number: userPhoneNumber,
     recipients: body.recipients.map((r) => r.value),
   };

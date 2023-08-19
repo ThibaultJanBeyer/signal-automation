@@ -19,7 +19,8 @@ import { Input } from "@sa/ui/input";
 import { CronPicker } from "@/components/CronPicker";
 
 export type FormData = {
-  messages: { value: string }[];
+  messages: { value?: string }[];
+  stickers: { value?: string }[];
   recipients: { value: string }[];
   scheduleCron: string;
   scheduleDelay: string;
@@ -44,6 +45,15 @@ export default function FormFields({ onSubmit, data, children }: Props) {
     remove,
   } = useFieldArray({
     name: "messages",
+    control: form.control,
+  });
+
+  const {
+    fields: stickersFields,
+    append: appendStickers,
+    remove: removeStickers,
+  } = useFieldArray({
+    name: "stickers",
     control: form.control,
   });
 
@@ -94,7 +104,7 @@ export default function FormFields({ onSubmit, data, children }: Props) {
         <FormField
           name="messages"
           errors={errors}
-          label="Messages to randomly chose from:"
+          label="Message(s) (one, randomly selected):"
         >
           <>
             {messagesFields.map((field, index) => (
@@ -139,7 +149,54 @@ export default function FormFields({ onSubmit, data, children }: Props) {
             </Button>
           </>
         </FormField>
-
+        <FormField
+          name="stickers"
+          errors={errors}
+          label="Sticker(s) (one, randomly selected) (does not work together):"
+        >
+          <>
+            {stickersFields.map((field, index) => (
+              <React.Fragment key={field.id}>
+                {Boolean(
+                  (errors as any).questions?.[index]?.value?.message,
+                ) && (
+                  <Form.Message className="text-red-600">
+                    {(errors as any).questions?.[index]?.value?.message}
+                  </Form.Message>
+                )}
+                <div
+                  key={field.id}
+                  className={`${
+                    index === stickersFields.length - 1 ? "" : "mb-2"
+                  } grid grid-cols-[1fr_auto] gap-2`}
+                >
+                  <Form.Control asChild>
+                    <Input
+                      key={field.id} // important to include key with field's id
+                      {...form.register(`stickers.${index}.value`)}
+                    />
+                  </Form.Control>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => removeStickers(index)}
+                  >
+                    <DeleteIcon>Delete</DeleteIcon>
+                  </Button>
+                </div>
+              </React.Fragment>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={() => appendStickers({ value: "" })}
+            >
+              Add
+            </Button>
+          </>
+        </FormField>
         <FormField name="recipients" errors={errors} label="Recipients:">
           <>
             {recipientsFields.map((field, index) => (
@@ -219,13 +276,16 @@ const FormField = <T extends keyof FormData>({
 };
 
 const schema = {
-  messages: zod
-    .array(
-      zod.object({
-        value: zod.string().nonempty({ message: "Message(s) is required" }),
-      }),
-    )
-    .nonempty({ message: "Message(s) are required" }),
+  messages: zod.array(
+    zod.object({
+      value: zod.string().nonempty({ message: "Message(s) is required" }),
+    }),
+  ),
+  stickers: zod.array(
+    zod.object({
+      value: zod.string().nonempty({ message: "Message(s) is required" }),
+    }),
+  ),
   recipients: zod
     .array(
       zod.object({
@@ -243,5 +303,6 @@ const getDefaultValues = (data?: FormData): FormData => ({
     `30 8 * * * {${Intl.DateTimeFormat().resolvedOptions().timeZone}}`,
   scheduleDelay: data?.scheduleDelay || `1`,
   messages: data?.messages || [{ value: "Hi :)" }],
+  stickers: data?.stickers || [{ value: "bf012b718285db8e3e86ceebddde3031:1" }],
   recipients: data?.recipients || [{ value: "+4917645708999" }],
 });
