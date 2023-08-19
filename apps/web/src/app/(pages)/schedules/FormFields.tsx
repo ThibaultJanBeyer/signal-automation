@@ -238,6 +238,9 @@ const schema = {
       }),
     )
     .nonempty({ message: "Recipient(s) are required" }),
+  attachmentsLuck: zod
+    .string()
+    .nonempty({ message: "attachmentsLuck required" }),
   scheduleCron: zod.string().nonempty({ message: "Schedule is required" }),
   scheduleDelay: zod.string().nonempty({ message: "Delay is required" }),
 };
