@@ -14,6 +14,7 @@ export default authMiddleware({
   afterAuth: async ({ userId }, req) => {
     try {
       if (req.url.includes("/link")) return;
+      if (!userId) return;
       if (hasCachedItem(`isRegistered_${userId}`)) {
         const cache: Boolean = getCachedItem(`isRegistered_${userId}`);
         if (cache) return;
