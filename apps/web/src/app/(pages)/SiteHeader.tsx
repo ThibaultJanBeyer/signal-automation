@@ -1,6 +1,13 @@
 import * as React from "react";
 import Link from "next/link";
-import { auth, UserButton } from "@clerk/nextjs";
+import {
+  auth,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from "@clerk/nextjs";
+
 import { Button } from "@sa/ui/button";
 import { SCHEDULES_PATH } from "@sa/utils/src/constants";
 
@@ -18,16 +25,15 @@ export function SiteHeader() {
           <div></div>
           <div className="pointer-events-auto flex flex-1 items-center justify-end space-x-4">
             <nav className="flex items-center space-x-2">
-              {userId ? (
-                <>
-                  <Button asChild variant="outline">
-                    <Link href={`${SCHEDULES_PATH}`}>Schedules</Link>
-                  </Button>
-                  <UserButton afterSignOutUrl="/" />
-                </>
-              ) : (
-                <UserButton afterSignOutUrl="/" />
-              )}
+              <SignedIn>
+                <Button asChild variant="outline">
+                  <Link href={`${SCHEDULES_PATH}`}>Schedules</Link>
+                </Button>
+                <UserButton />
+              </SignedIn>
+              <SignedOut>
+                <SignInButton />
+              </SignedOut>
             </nav>
           </div>
         </div>
