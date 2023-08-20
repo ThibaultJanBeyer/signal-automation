@@ -34,6 +34,7 @@ export async function createAction(data: FormData) {
     credentials: "include",
     body,
   });
+  if (!resp.ok) throw new Error(`Error creating schedule ${resp.statusText}`);
   const result = await resp.json();
 
   const users = (await redis.get(`users`)) as { [key: string]: InternalUser };
