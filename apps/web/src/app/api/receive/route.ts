@@ -31,15 +31,25 @@ export async function POST(req: Request) {
       });
       const result = await resp.json();
 
+      const ttl = await redis.pttl(`recent_messages_${userId}`);
+      const composed =
+        ttl > 0
+          ? JSON.parse(
+              lz.decompressFromUTF16(
+                (await redis.get(`recent_messages_${userId}`))!,
+              ),
+            )
+          : [];
       const extracted = messageExtractionTeam(result);
-      console.log("extracted", extracted);
+      composed.push(...extracted);
+      const compressed = lz.compressToUTF16(JSON.stringify(composed));
 
-      if (extracted.length > 0)
-        await redis.set(
-          `recent_messages_${userId}`,
-          lz.compress(JSON.stringify(extracted)),
-          { ex: 60 * 60 * 3 },
-        );
+      if (extracted.length > 0) {
+        console.log("ttl", ttl);
+        await redis.set(`recent_messages_${userId}`, `${compressed}`, {
+          ex: ttl > 0 ? Math.floor(ttl / 1000) : 60 * 60 * 5,
+        });
+      }
     }
   }
 
@@ -101,17 +111,34 @@ const messageExtractionTeam = (
     };
   };
 
+  const getStatus = (m?: Partial<ReceiptMessage> | Partial<ReadMessage>) => {
+    if (!m) return undefined;
+    if ("isRead" in m)
+      return m?.isRead
+        ? "read"
+        : m?.isViewed
+        ? "viewed"
+        : m?.isDelivery
+        ? "delivered"
+        : undefined;
+    else if ("sender" in m) return "sent";
+  };
+
   return messages.flatMap((m) => {
     const message = removeEmpty(
       removeEmpty({
         timestamp: m?.envelope?.timestamp || 0,
         received: getRelevance(m?.envelope?.dataMessage),
         sent: getRelevance(m?.envelope?.syncMessage?.sentMessage),
+        status: getStatus(
+          m?.envelope?.receiptMessage ||
+            m?.envelope?.syncMessage?.readMessages?.[0],
+        ),
         sourceName: m?.envelope?.sourceName || "Unknown",
       }),
     );
 
-    if (!message?.received && !message?.sent) {
+    if (!message?.received && !message?.sent && !message?.status) {
       console.info("untracked message", JSON.stringify(m, null, 2));
       return [];
     }
@@ -161,27 +188,14 @@ export type PotentialMessage = {
     sourceName: string; //<=
     sourceDevice: number;
     timestamp: number;
-    receiptMessage?: {
-      when: number;
-      isDelivery: boolean;
-      isRead: boolean;
-      isViewed: boolean;
-      timestamps: [number];
-    };
+    receiptMessage?: ReceiptMessage;
     dataMessage?: BaseMessage & {
       timestamp: number;
       expiresInSeconds: number;
       viewOnce: boolean;
     };
     syncMessage?: {
-      readMessages?: [
-        {
-          sender: string;
-          senderNumber: string;
-          senderUuid: string;
-          timestamp: number;
-        },
-      ];
+      readMessages?: ReadMessage[];
       sentMessage?: BaseMessage & {
         destination: string;
         destinationNumber: string;
@@ -193,4 +207,19 @@ export type PotentialMessage = {
     };
   };
   account: string;
+};
+
+type ReadMessage = {
+  sender: string;
+  senderNumber: string;
+  senderUuid: string;
+  timestamp: number;
+};
+
+type ReceiptMessage = {
+  when: number;
+  isDelivery: boolean;
+  isRead: boolean;
+  isViewed: boolean;
+  timestamps: [number];
 };

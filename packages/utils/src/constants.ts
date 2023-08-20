@@ -16,5 +16,6 @@ export const WEB_URI =
   process.env.VERCEL_URL;
 
 export const MESSAGE_HANDLER_URL = `https://${WEB_URI}/api/send`;
-export const MESSAGE_RECEIVER_URL = `https://${WEB_URI}/api/receive`;
+export const MESSAGE_RECEIVER_PATH = `/api/receive`;
+export const MESSAGE_RECEIVER_URL = `https://${WEB_URI}${MESSAGE_RECEIVER_PATH}`;
 export const LINK_HANDLER_URL = `https://${WEB_URI}/link`;

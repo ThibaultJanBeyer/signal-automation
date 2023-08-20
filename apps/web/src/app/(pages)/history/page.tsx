@@ -21,7 +21,7 @@ const getData = async (): Promise<ExtractedMessage[]> => {
   if (!userId) return redirect("/");
   const raw = (await redis.get(`recent_messages_${userId}`)) as string | null;
   if (!raw) return [];
-  return JSON.parse(lz.decompress(raw));
+  return JSON.parse(lz.decompressFromUTF16(raw));
 };
 
 export default async function StandupList() {

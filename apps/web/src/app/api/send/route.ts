@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   if (auth !== process.env.SERVER_TOKEN)
     return new NextResponse("Missing Auth", { status: 401 });
 
-  const decompressed = lz.decompress(json.body);
+  const decompressed = lz.decompressFromUTF16(json.body);
   const body: FormData = JSON.parse(decompressed);
 
   const msg = getRandomItemFromArray(body.messages)?.value;

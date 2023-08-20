@@ -20,7 +20,7 @@ export async function createAction(data: FormData) {
 
   const { cron, timeZone } = parseCustomCronString(data.scheduleCron);
   const stringified = JSON.stringify(data);
-  const body = lz.compress(stringified);
+  const body = lz.compressToUTF16(stringified);
 
   const resp = await fetch(`${UPSTASH_PUBLISH_URI}/${MESSAGE_HANDLER_URL}`, {
     method: "POST",
@@ -47,7 +47,7 @@ export async function createAction(data: FormData) {
         [result.scheduleId]: {
           cron,
           createdAt: new Date().toISOString(),
-          body,
+          body: `${body}`,
         },
       },
     },

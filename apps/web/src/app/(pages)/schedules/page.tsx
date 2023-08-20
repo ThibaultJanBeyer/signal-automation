@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@sa/ui/table";
+import { parseCustomCronString } from "@sa/utils/src/parseCustomCronString";
 
 import { getUser } from "@/lib/getUser";
 
@@ -40,7 +41,7 @@ const getData = async (): Promise<
   if (!user) return redirect("/");
   return Object.keys(user.schedules || {}).map((id) => {
     const schedule = user.schedules![id]!;
-    const decompressed = lz.decompress(schedule.body);
+    const decompressed = lz.decompressFromUTF16(schedule.body);
     return {
       id,
       createdAt: schedule.createdAt,
@@ -74,6 +75,7 @@ export default async function StandupList() {
         <TableBody>
           {data.map(({ name, scheduleCron, createdAt, recipients, id }) => {
             const date = new Date(createdAt);
+            const { cron } = parseCustomCronString(scheduleCron);
             return (
               <TableRow key={id}>
                 <TableCell className="font-medium">
@@ -81,7 +83,7 @@ export default async function StandupList() {
                     {name}
                   </Link>
                 </TableCell>
-                <TableCell>{scheduleCron}</TableCell>
+                <TableCell>{cron}</TableCell>
                 <TableCell>{date.toLocaleString()}</TableCell>
                 <TableCell>{recipients.map((v) => v.value)}</TableCell>
                 <TableCell>
