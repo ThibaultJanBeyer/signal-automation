@@ -108,11 +108,11 @@ export default function FormFields({ onSubmit, data, children }: Props) {
             />
           </FormField>
         )}
-        {/* <MultiFormField
+        <MultiFormField
           name="stickers"
           form={form}
           label="Stickers(s) (one, randomly selected):"
-        /> */}
+        />
         <MultiFormField name="recipients" form={form} label="Recipient(s):" />
         {children}
       </Form.Root>
