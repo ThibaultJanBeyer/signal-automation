@@ -270,5 +270,5 @@ const getDefaultValues = (data?: FormData): FormData => ({
   attachmentsLuck: data?.attachmentsLuck || `100`,
   attachments: data?.attachments || [],
   stickers: data?.stickers || [],
-  recipients: data?.recipients || [{ value: "+4917645708999" }],
+  recipients: data?.recipients || [{ value: "+4917645708000" }],
 });

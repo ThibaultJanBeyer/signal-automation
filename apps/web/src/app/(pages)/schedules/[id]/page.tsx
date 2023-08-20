@@ -25,7 +25,7 @@ const getData = async (id: string): Promise<FormData | null> => {
     return null;
   }
   const buffer = Buffer.from(data.content.body, "base64").toString();
-  const decompressed = lz.decompress(buffer);
+  const decompressed = lz.decompress(JSON.parse(buffer).body);
   const body: FormData = JSON.parse(decompressed);
   return body;
 };

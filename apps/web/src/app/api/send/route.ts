@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { clerkClient } from "@clerk/nextjs";
+import lz from "lz-string";
 
 import { SERVER_POST_URI, UPSTASH_PUBLISH_URI } from "@sa/utils/src/constants";
 import { getRandomItemFromArray, isSelected } from "@sa/utils/src/random";
@@ -15,12 +15,15 @@ export async function POST(req: Request) {
   const auth = req.headers.get("Auth");
   const userId = req.headers.get("UserId");
   const user = await getUser(userId!);
-  const body: FormData = await req.json();
+  const json: { body: string } = await req.json();
 
   if (!user?.phoneNumber)
     return new NextResponse("Missing User", { status: 401 });
   if (auth !== process.env.SERVER_TOKEN)
     return new NextResponse("Missing Auth", { status: 401 });
+
+  const decompressed = lz.decompress(json.body);
+  const body: FormData = JSON.parse(decompressed);
 
   const msg = getRandomItemFromArray(body.messages)?.value;
   const stkr = getRandomItemFromArray(body.stickers)?.value;
@@ -34,7 +37,6 @@ export async function POST(req: Request) {
     number: user?.phoneNumber,
     recipients: body.recipients.map((r) => r.value),
   };
-  console.log("message", message, body);
 
   const resp = await fetch(`${UPSTASH_PUBLISH_URI}/${SERVER_POST_URI}`, {
     method: "POST",

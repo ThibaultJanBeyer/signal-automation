@@ -32,7 +32,7 @@ export async function createAction(data: FormData) {
       "Upstash-Forward-UserId": userId,
     },
     credentials: "include",
-    body,
+    body: JSON.stringify({ body }),
   });
   if (!resp.ok) throw new Error(`Error creating schedule ${resp.statusText}`);
   const result = await resp.json();
