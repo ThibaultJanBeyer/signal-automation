@@ -2,8 +2,6 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
 
-process.env.NEXTAUTH_URL = `${process.env.PROTOCOL}${process.env.WEB_URI}`;
-
 module.exports = async (phase, { defaultConfig }) => {
   /** @type {import('next').NextConfig} */
   const nextConfig = {
@@ -12,6 +10,7 @@ module.exports = async (phase, { defaultConfig }) => {
 
     experimental: {
       serverActions: true,
+      instrumentationHook: true,
     },
     transpilePackages: ["@sa/ui"],
     images: {

@@ -25,6 +25,15 @@ export default function Page() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <FormFields onSubmit={onSubmit}>
+        <div className="mb-10">
+          Note following for delivery to work:
+          <br />- You need to have had an interaction first with all recipients
+          in the last 20 minutes
+          <br />- Make sure that the recipients number is exactly the same as
+          the number listed in Signal app for that user
+          <br />- Make sure that you are logged in here with the same phone
+          number as the one you have connected with in the Signal app
+        </div>
         <Submit asChild>
           <Button type="submit" variant="outlinePrimary" loading={false}>
             Create

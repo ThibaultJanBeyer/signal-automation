@@ -5,11 +5,12 @@ import {
   SignedIn,
   SignedOut,
   SignInButton,
+  SignUpButton,
   UserButton,
 } from "@clerk/nextjs";
 
 import { Button } from "@sa/ui/button";
-import { SCHEDULES_PATH } from "@sa/utils/src/constants";
+import { HISTORY_PATH, SCHEDULES_PATH } from "@sa/utils/src/constants";
 
 export function SiteHeader() {
   const { userId } = auth();
@@ -29,10 +30,22 @@ export function SiteHeader() {
                 <Button asChild variant="outline">
                   <Link href={`${SCHEDULES_PATH}`}>Schedules</Link>
                 </Button>
+                <Button asChild variant="outline">
+                  <Link href={`${HISTORY_PATH}`}>History</Link>
+                </Button>
                 <UserButton />
               </SignedIn>
               <SignedOut>
-                <SignInButton />
+                <Button asChild variant="outline" className="mr-5">
+                  <div>
+                    <SignInButton />
+                  </div>
+                </Button>
+                <Button asChild variant="outline">
+                  <div>
+                    <SignUpButton />
+                  </div>
+                </Button>
               </SignedOut>
             </nav>
           </div>

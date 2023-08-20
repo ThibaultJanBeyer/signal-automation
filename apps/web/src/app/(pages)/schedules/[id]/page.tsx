@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs";
+import lz from "lz-string";
 
 import { Skeleton } from "@sa/ui/skeleton";
 import { UPSTASH_SCHEDULES_URI } from "@sa/utils/src/constants";
@@ -19,12 +20,13 @@ const getData = async (id: string): Promise<FormData | null> => {
     },
   });
   const data: Schedule = await res.json();
-
-  if (!data) return null;
-  const body: FormData = JSON.parse(
-    Buffer.from(data.content.body, "base64").toString(),
-  );
-
+  if (!data || (data as any)?.error) {
+    console.error((data as any)?.error);
+    return null;
+  }
+  const buffer = Buffer.from(data.content.body, "base64").toString();
+  const decompressed = lz.decompress(buffer);
+  const body: FormData = JSON.parse(decompressed);
   return body;
 };
 

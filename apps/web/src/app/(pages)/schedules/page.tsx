@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs";
+import lz from "lz-string";
 
 import { Button } from "@sa/ui/button";
 import {
@@ -13,7 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@sa/ui/table";
-import { UPSTASH_SCHEDULES_URI } from "@sa/utils/src/constants";
+
+import { getUser } from "@/lib/getUser";
+
+import { FormData } from "./FormFields";
 
 export type Schedule = {
   scheduleId: string;
@@ -27,20 +31,23 @@ export type Schedule = {
   settings: { retries: 3 };
 };
 
-const getData = async (): Promise<Schedule[] | null> => {
+const getData = async (): Promise<
+  ({ id: string; createdAt: string } & FormData)[]
+> => {
   const { userId } = await auth();
   if (!userId) return redirect("/");
-  const res = await fetch(`${UPSTASH_SCHEDULES_URI}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.UPSTASH_TOKEN}`,
-    },
+  const user = await getUser(userId);
+  if (!user) return redirect("/");
+  return Object.keys(user.schedules || {}).map((id) => {
+    const schedule = user.schedules![id]!;
+    const decompressed = lz.decompress(schedule.body);
+    return {
+      id,
+      createdAt: schedule.createdAt,
+      cron: schedule.cron,
+      ...JSON.parse(decompressed),
+    };
   });
-  const data: Schedule[] | null = await res.json();
-  if (!data) return null;
-
-  return data;
 };
 
 export default async function StandupList() {
@@ -57,27 +64,29 @@ export default async function StandupList() {
         <TableCaption>A list of your workspaces standups.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Id</TableHead>
+            <TableHead>Name</TableHead>
             <TableHead>Cron</TableHead>
             <TableHead>Created At</TableHead>
+            <TableHead>Recipients</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data?.map(({ scheduleId, createdAt, cron }) => {
-            const date = new Date(createdAt as any as string);
+          {data.map(({ name, scheduleCron, createdAt, recipients, id }) => {
+            const date = new Date(createdAt);
             return (
-              <TableRow key={scheduleId}>
+              <TableRow key={id}>
                 <TableCell className="font-medium">
-                  <Link href={`/schedules/${scheduleId}`} className="block">
-                    {scheduleId}
+                  <Link href={`/schedules/${id}`} className="block">
+                    {name}
                   </Link>
                 </TableCell>
-                <TableCell>{cron}</TableCell>
+                <TableCell>{scheduleCron}</TableCell>
                 <TableCell>{date.toLocaleString()}</TableCell>
+                <TableCell>{recipients.map((v) => v.value)}</TableCell>
                 <TableCell>
                   <Button asChild>
-                    <Link href={`/schedules/${scheduleId}`} className="block">
+                    <Link href={`/schedules/${id}`} className="block">
                       Open
                     </Link>
                   </Button>

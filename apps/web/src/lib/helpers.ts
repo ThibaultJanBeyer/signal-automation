@@ -1,5 +1,3 @@
-import { WebClient } from "@slack/web-api";
-
 /**
  * Convert all null in an object values to undefined,
  * and remove the null type from the object keys
@@ -28,13 +26,15 @@ export function typedObjectKeys<T extends object>(object: T) {
   return Object.keys(object) as (keyof typeof object)[];
 }
 
-export async function isTokenValid(token?: string) {
-  if (!token) return false;
-  try {
-    const client = new WebClient(token);
-    await client.auth.test();
-    return true;
-  } catch (error) {
-    return false;
-  }
+export function removeEmpty<T extends any>(obj: T): T | undefined {
+  return Object.fromEntries(
+    Object.entries(obj || {})
+      .filter(([_, v]) => {
+        return (
+          typeof v === "number" ||
+          (!!v && Object.values(v || {}).filter((v) => !!v).length > 0)
+        );
+      })
+      .map(([k, v]) => [k, v === Object(v) ? removeEmpty(v) : v]),
+  ) as T | undefined;
 }

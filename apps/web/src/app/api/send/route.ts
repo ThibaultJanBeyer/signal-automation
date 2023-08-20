@@ -4,7 +4,8 @@ import { clerkClient } from "@clerk/nextjs";
 import { SERVER_POST_URI, UPSTASH_PUBLISH_URI } from "@sa/utils/src/constants";
 import { getRandomItemFromArray, isSelected } from "@sa/utils/src/random";
 
-import { FormData } from "../(pages)/schedules/FormFields";
+import { FormData } from "@/app/(pages)/schedules/FormFields";
+import { getUser } from "@/lib/getUser";
 
 export async function GET() {
   return new NextResponse("Hello world!");
@@ -13,18 +14,11 @@ export async function GET() {
 export async function POST(req: Request) {
   const auth = req.headers.get("Auth");
   const userId = req.headers.get("UserId");
-  const user = await clerkClient.users.getUser(userId!);
-  const userPhoneNumber = user.phoneNumbers.find(
-    (p) => p.id === user.primaryPhoneNumberId,
-  )?.phoneNumber;
-  console.log(
-    "user",
-    user.phoneNumbers.find((p) => p.id === user.primaryPhoneNumberId)
-      ?.phoneNumber,
-  );
-
+  const user = await getUser(userId!);
   const body: FormData = await req.json();
 
+  if (!user?.phoneNumber)
+    return new NextResponse("Missing User", { status: 401 });
   if (auth !== process.env.SERVER_TOKEN)
     return new NextResponse("Missing Auth", { status: 401 });
 
@@ -37,10 +31,9 @@ export async function POST(req: Request) {
     ...(msg ? { message: msg } : {}),
     ...(stkr ? { sticker: stkr } : {}),
     ...(att ? { base64_attachments: att } : {}),
-    number: userPhoneNumber,
+    number: user?.phoneNumber,
     recipients: body.recipients.map((r) => r.value),
   };
-
   console.log("message", message, body);
 
   const resp = await fetch(`${UPSTASH_PUBLISH_URI}/${SERVER_POST_URI}`, {
@@ -49,7 +42,7 @@ export async function POST(req: Request) {
       Authorization: `Bearer ${process.env.UPSTASH_TOKEN}`,
       "Content-Type": "application/json",
       "Upstash-Delay": `${Math.random() * Number(body.scheduleDelay || 0)}m`,
-      "Upstash-Forward-Auth": process.env.SERVER_TOKEN!,
+      "Upstash-Forward-Auth": auth,
     },
     credentials: "include",
     body: JSON.stringify(message),

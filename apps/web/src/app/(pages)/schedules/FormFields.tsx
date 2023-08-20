@@ -22,6 +22,7 @@ import { cn } from "@sa/ui/utils";
 import { CronPicker } from "@/components/CronPicker";
 
 export type FormData = {
+  name: string;
   messages: { value?: string }[];
   attachments: { value?: string }[];
   stickers: { value?: string }[];
@@ -57,6 +58,9 @@ export default function FormFields({ onSubmit, data, children }: Props) {
         </div>
       ) : null}
       <Form.Root onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField name="name" errors={errors} label="Name of the schedule:">
+          <Input {...form.register("name")} />
+        </FormField>
         <FormField
           name="scheduleCron"
           errors={errors}
@@ -215,7 +219,12 @@ const MultiFormField = <T extends keyof FormData>({
   );
 };
 
+const phoneRegex = new RegExp(
+  /\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/,
+);
+
 const schema = {
+  name: zod.string().nonempty({ message: "Name is required" }),
   messages: zod.array(
     zod.object({
       value: zod.string().nonempty({ message: "Message(s) is required" }),
@@ -234,7 +243,13 @@ const schema = {
   recipients: zod
     .array(
       zod.object({
-        value: zod.string().nonempty({ message: "Recipient(s) is required" }),
+        value: zod
+          .string()
+          .regex(
+            phoneRegex,
+            "Phone number needs to be in international format (i.e. +4917605708001",
+          )
+          .nonempty({ message: "Recipient(s) is required" }),
       }),
     )
     .nonempty({ message: "Recipient(s) are required" }),
@@ -246,6 +261,7 @@ const schema = {
 };
 
 const getDefaultValues = (data?: FormData): FormData => ({
+  name: data?.name || "My Schedule",
   scheduleCron:
     data?.scheduleCron ||
     `30 8 * * * {${Intl.DateTimeFormat().resolvedOptions().timeZone}}`,
