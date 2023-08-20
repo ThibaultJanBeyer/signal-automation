@@ -7,8 +7,6 @@ import {
 
 import { Schedule } from "@/app/(pages)/schedules/page";
 
-import { redis } from "./redis";
-
 export const setupSchedule = async () => {
   const response = await fetch(`${UPSTASH_SCHEDULES_URI}`, {
     method: "GET",
@@ -18,8 +16,8 @@ export const setupSchedule = async () => {
     },
   });
   const res: Schedule[] = await response.json();
-  const receiveScheduleIds = res?.filter((r) =>
-    r.destination.url.includes(MESSAGE_RECEIVER_PATH),
+  const receiveScheduleIds = res?.filter(
+    (r) => r.destination.url === MESSAGE_RECEIVER_PATH,
   );
   if (receiveScheduleIds.length > 0)
     await Promise.all(
@@ -46,5 +44,4 @@ export const setupSchedule = async () => {
     credentials: "include",
   });
   const result = await resp.json();
-  await redis.set(`receiveSchedule`, result.scheduleId);
 };
