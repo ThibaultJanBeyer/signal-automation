@@ -45,9 +45,8 @@ export async function POST(req: Request) {
       const compressed = lz.compressToUTF16(JSON.stringify(composed));
 
       if (extracted.length > 0) {
-        console.log("ttl", ttl);
         await redis.set(`recent_messages_${userId}`, `${compressed}`, {
-          ex: ttl > 0 ? Math.floor(ttl / 1000) : 60 * 60 * 5,
+          ex: ttl > 0 ? Math.floor(ttl / 1000) : 60 * 60 * 8,
         });
       }
     }
