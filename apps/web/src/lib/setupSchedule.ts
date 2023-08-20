@@ -9,9 +9,10 @@ import { Schedule } from "@/app/(pages)/schedules/page";
 import { redis } from "./redis";
 
 export const setupSchedule = async () => {
-  const receiveScheduleIds = await redis.keys(
-    `receiveScheduleIds_${MESSAGE_RECEIVER_URL}`,
-  );
+  const receiveScheduleIds =
+    ((await redis.get(
+      `receiveScheduleIds_${MESSAGE_RECEIVER_URL}`,
+    )) as string[]) || [];
   if (receiveScheduleIds.length > 0)
     await Promise.all(
       receiveScheduleIds.map(
