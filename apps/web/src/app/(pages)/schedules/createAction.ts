@@ -9,7 +9,6 @@ import {
 } from "@sa/utils/src/constants";
 import { parseCustomCronString } from "@sa/utils/src/parseCustomCronString";
 
-import { type InternalUser } from "@/lib/getUser";
 import { redis } from "@/lib/redis";
 
 import { type FormData } from "./FormFields";
@@ -37,19 +36,13 @@ export async function createAction(data: FormData) {
   if (!resp.ok) throw new Error(`Error creating schedule ${resp.statusText}`);
   const result = await resp.json();
 
-  const users = (await redis.get(`users`)) as { [key: string]: InternalUser };
-  await redis.set(`users`, {
-    ...users,
-    [userId]: {
-      ...users?.[userId],
-      schedules: {
-        ...users?.[userId]?.schedules,
-        [result.scheduleId]: {
-          cron,
-          createdAt: new Date().toISOString(),
-          body: `${body}`,
-        },
-      },
+  const prev = (await redis.get(`schedules_${userId}`)) as any;
+  await redis.set(`schedules_${userId}`, {
+    ...prev,
+    [result.scheduleId]: {
+      cron,
+      createdAt: new Date().toISOString(),
+      body: `${body}`,
     },
   });
 

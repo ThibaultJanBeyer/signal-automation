@@ -16,7 +16,7 @@ import {
 } from "@sa/ui/table";
 import { parseCustomCronString } from "@sa/utils/src/parseCustomCronString";
 
-import { getUser } from "@/lib/getUser";
+import { redis } from "@/lib/redis";
 
 import { FormData } from "./FormFields";
 
@@ -33,22 +33,28 @@ export type Schedule = {
 };
 
 const getData = async (): Promise<
-  ({ id: string; createdAt: string } & FormData)[]
+  ({ _id: string; createdAt: string } & FormData)[]
 > => {
   const { userId } = await auth();
   if (!userId) return redirect("/");
-  const user = await getUser(userId);
-  if (!user) return redirect("/");
-  return Object.keys(user.schedules || {}).map((id) => {
-    const schedule = user.schedules![id]!;
+  const schedules = (await redis.get(`schedules_${userId}`)) as {
+    [key: string]: {
+      createdAt: string;
+      cron: string;
+      body: string;
+    };
+  };
+  const items = Object.keys(schedules || {}).map((id) => {
+    const schedule = schedules![id]!;
     const decompressed = lz.decompressFromUTF16(schedule.body);
     return {
-      id,
+      _id: id,
       createdAt: schedule.createdAt,
       cron: schedule.cron,
       ...JSON.parse(decompressed),
     };
   });
+  return items;
 };
 
 export default async function StandupList() {
@@ -73,13 +79,13 @@ export default async function StandupList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map(({ name, scheduleCron, createdAt, recipients, id }) => {
+          {data.map(({ name, scheduleCron, createdAt, recipients, _id }) => {
             const date = new Date(createdAt);
             const { cron } = parseCustomCronString(scheduleCron);
             return (
-              <TableRow key={id}>
+              <TableRow key={_id}>
                 <TableCell className="font-medium">
-                  <Link href={`/schedules/${id}`} className="block">
+                  <Link href={`/schedules/${_id}`} className="block">
                     {name}
                   </Link>
                 </TableCell>
@@ -88,7 +94,7 @@ export default async function StandupList() {
                 <TableCell>{recipients.map((v) => v.value)}</TableCell>
                 <TableCell>
                   <Button asChild>
-                    <Link href={`/schedules/${id}`} className="block">
+                    <Link href={`/schedules/${_id}`} className="block">
                       Open
                     </Link>
                   </Button>

@@ -4,13 +4,6 @@ import { redis } from "./redis";
 
 export type InternalUser = {
   phoneNumber?: string;
-  schedules?: {
-    [key: string]: {
-      createdAt: string;
-      cron: string;
-      body: string;
-    };
-  };
 };
 
 export const getUser = async (userId: string) => {
