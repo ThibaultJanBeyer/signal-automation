@@ -4,7 +4,7 @@ import {
   UPSTASH_SCHEDULES_URI,
 } from "@sa/utils/src/constants";
 
-import { redis } from "./redis";
+import { Schedule } from "@/app/(pages)/schedules/page";
 
 let isRunning = false;
 
@@ -12,14 +12,22 @@ export const setupSchedule = async () => {
   if (isRunning) return;
   isRunning = true;
 
-  const receiveScheduleIds =
-    ((await redis.get(
-      `receiveScheduleIds_${MESSAGE_RECEIVER_URL}`,
-    )) as string[]) || [];
-  if (receiveScheduleIds.length > 0)
+  const res = await fetch(`${UPSTASH_SCHEDULES_URI}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${process.env.UPSTASH_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+  });
+  const receiveSchedules: Schedule[] = await res.json();
+  const receiveSchedulesIds = receiveSchedules
+    .filter((r) => r.destination.url == MESSAGE_RECEIVER_URL)
+    .map((r) => r.scheduleId);
+
+  if (receiveSchedulesIds.length > 0)
     await Promise.all(
-      receiveScheduleIds.map(async (r, index) => {
-        const res = await fetch(`${UPSTASH_SCHEDULES_URI}/${r}`, {
+      receiveSchedulesIds.map(async (id, index) => {
+        const res = await fetch(`${UPSTASH_SCHEDULES_URI}/${id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -27,10 +35,7 @@ export const setupSchedule = async () => {
           },
         });
         const result = await res.json();
-        if (result) {
-          console.log(`Deleted schedule ${r}`);
-          receiveScheduleIds.splice(index, 1);
-        }
+        console.log(`Deleted schedule ${result.scheduleId}`);
       }),
     );
 
@@ -45,11 +50,7 @@ export const setupSchedule = async () => {
     credentials: "include",
   });
   const result = await resp.json();
-  receiveScheduleIds.push(result.scheduleId);
-  await redis.set(
-    `receiveScheduleIds_${MESSAGE_RECEIVER_URL}`,
-    receiveScheduleIds,
-  );
+  console.log(`Created schedule ${result.scheduleId}`);
 
   isRunning = false;
 };
