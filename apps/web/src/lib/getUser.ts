@@ -13,14 +13,13 @@ export const getUser = async (userId: string) => {
   const userPhoneNumber = user.phoneNumbers.find(
     (p) => p.id === user.primaryPhoneNumberId,
   )?.phoneNumber;
-  if (users?.[userId]?.phoneNumber !== userPhoneNumber)
-    await redis.set(`users`, {
-      ...users,
-      [userId]: {
-        ...users?.[userId],
-        phoneNumber: userPhoneNumber,
-      },
-    });
+  await redis.set(`users`, {
+    ...users,
+    [userId]: {
+      ...users?.[userId],
+      phoneNumber: userPhoneNumber,
+    },
+  });
 
   return users?.[userId];
 };

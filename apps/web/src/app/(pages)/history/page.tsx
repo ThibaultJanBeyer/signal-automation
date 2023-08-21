@@ -26,7 +26,7 @@ const getData = async (): Promise<ExtractedMessage[]> => {
 
 export default async function StandupList() {
   const data = await getData();
-
+  const sorted = data.sort((a, b) => b.timestamp - a.timestamp);
   return (
     <main className="mx-auto w-full max-w-5xl">
       <Table>
@@ -41,12 +41,13 @@ export default async function StandupList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data?.map((m, id) => {
+          {sorted?.map((m, id) => {
+            if (!m.received && !m.sent && m.isSelf) return null;
             return (
               <TableRow key={id}>
                 <TableCell className="font-medium">{m.sourceName}</TableCell>
                 <TableCell>
-                  {JSON.stringify(m.received || m.sent, null, 2)}
+                  {JSON.stringify(m.received || m.sent || m.status, null, 2)}
                 </TableCell>
                 <TableCell>{new Date(m?.timestamp).toLocaleString()}</TableCell>
               </TableRow>

@@ -21,7 +21,10 @@ export async function POST(req: Request) {
   for (const userId in users) {
     if (Object.prototype.hasOwnProperty.call(users, userId)) {
       const user = users[userId]!;
-      const resp = await fetch(`${SERVER_RECEIVE_URI}/${user.phoneNumber}`, {
+      const phoneNumber = user.phoneNumber;
+      if (!phoneNumber) continue;
+
+      const resp = await fetch(`${SERVER_RECEIVE_URI}/${phoneNumber}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +43,7 @@ export async function POST(req: Request) {
               ),
             )
           : [];
-      const extracted = messageExtractionTeam(result);
+      const extracted = messageExtractionTeam(result, phoneNumber);
       composed.push(...extracted);
       const compressed = lz.compressToUTF16(JSON.stringify(composed));
 
@@ -77,12 +80,15 @@ type ReturnedMessage = {
 export type ExtractedMessage = {
   received?: ReturnedMessage;
   sent?: ReturnedMessage;
+  status?: string;
   timestamp: number;
   sourceName: string;
+  isSelf?: boolean;
 };
 
 const messageExtractionTeam = (
   messages: Partial<PotentialMessage[]>,
+  phoneNumber: string,
 ): ExtractedMessage[] => {
   const getAttachments = (m?: Partial<Attachment[]>) => {
     return m?.map((a) => ({
@@ -133,6 +139,7 @@ const messageExtractionTeam = (
           m?.envelope?.receiptMessage ||
             m?.envelope?.syncMessage?.readMessages?.[0],
         ),
+        isSelf: phoneNumber === m?.envelope?.sourceNumber,
         sourceName: m?.envelope?.sourceName || "Unknown",
       }),
     );
