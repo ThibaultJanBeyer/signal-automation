@@ -44,14 +44,13 @@ export async function POST(req: Request) {
             )
           : [];
       const extracted = messageExtractionTeam(result, phoneNumber);
+      if (!extracted || !extracted.length) return;
       composed.push(...extracted);
       const compressed = lz.compressToUTF16(JSON.stringify(composed));
 
-      if (extracted.length > 0) {
-        await redis.set(`recent_messages_${userId}`, `${compressed}`, {
-          ex: ttl > 0 ? Math.floor(ttl / 1000) : 60 * 60 * 8,
-        });
-      }
+      await redis.set(`recent_messages_${userId}`, `${compressed}`, {
+        ex: ttl > 0 ? Math.floor(ttl / 1000) : 60 * 60 * 8,
+      });
     }
   }
 
@@ -90,6 +89,13 @@ const messageExtractionTeam = (
   messages: Partial<PotentialMessage[]>,
   phoneNumber: string,
 ): ExtractedMessage[] => {
+  if (!Array.isArray(messages)) {
+    console.error(
+      "messages is not an array",
+      JSON.stringify(messages, null, 2),
+    );
+    return [];
+  }
   const getAttachments = (m?: Partial<Attachment[]>) => {
     return m?.map((a) => ({
       filename: a?.filename,
