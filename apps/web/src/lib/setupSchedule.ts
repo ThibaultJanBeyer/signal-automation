@@ -48,7 +48,7 @@ export const setupSchedule = async () => {
       headers: {
         Authorization: `Bearer ${process.env.UPSTASH_TOKEN}`,
         "Content-Type": "application/json",
-        "Upstash-Cron": "*/10 * * * *",
+        "Upstash-Cron": "*/11 * * * *",
         "Upstash-Forward-Auth": process.env.SERVER_TOKEN!,
       },
       credentials: "include",
