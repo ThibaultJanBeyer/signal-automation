@@ -13,8 +13,10 @@ import {
   TableRow,
 } from "@sa/ui/table";
 
-import { ExtractedMessage } from "@/app/api/receive/route";
+import { type ExtractedMessage } from "@/app/api/receive/message";
 import { redis } from "@/lib/redis";
+
+import PollButton from "./PollButton";
 
 const getData = async (): Promise<ExtractedMessage[]> => {
   const { userId } = await auth();
@@ -29,6 +31,7 @@ export default async function StandupList() {
   const sorted = data.sort((a, b) => b.timestamp - a.timestamp);
   return (
     <main className="mx-auto w-full max-w-5xl">
+      <PollButton />
       <Table>
         <TableCaption>
           Latest messages from your interactions in the last minutes.
