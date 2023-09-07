@@ -44,7 +44,7 @@ export async function POST(req: Request) {
             )
           : [];
       const extracted = messageExtractionTeam(result, phoneNumber);
-      if (!extracted || !extracted.length) return;
+      if (!extracted || !extracted.length) continue;
       composed.push(...extracted);
       const compressed = lz.compressToUTF16(JSON.stringify(composed));
 
