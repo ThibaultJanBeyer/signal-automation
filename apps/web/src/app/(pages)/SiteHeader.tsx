@@ -10,7 +10,11 @@ import {
 } from "@clerk/nextjs";
 
 import { Button } from "@sa/ui/button";
-import { HISTORY_PATH, SCHEDULES_PATH } from "@sa/utils/src/constants";
+import {
+  HISTORY_PATH,
+  LINK_PATH,
+  SCHEDULES_PATH,
+} from "@sa/utils/src/constants";
 
 export function SiteHeader() {
   const { userId } = auth();
@@ -27,6 +31,9 @@ export function SiteHeader() {
           <div className="pointer-events-auto flex flex-1 items-center justify-end space-x-4">
             <nav className="flex items-center space-x-2">
               <SignedIn>
+                <Button asChild variant="outline">
+                  <Link href={`${LINK_PATH}`}>Link Number</Link>
+                </Button>
                 <Button asChild variant="outline">
                   <Link href={`${SCHEDULES_PATH}`}>Schedules</Link>
                 </Button>

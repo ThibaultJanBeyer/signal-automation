@@ -1,5 +1,6 @@
 export const SCHEDULES_PATH = "/schedules";
 export const HISTORY_PATH = "/history";
+export const LINK_PATH = "/link";
 
 export const UPSTASH_SCHEDULES_URI = "https://qstash.upstash.io/v1/schedules";
 export const UPSTASH_PUBLISH_PATH = "publish";
@@ -18,4 +19,4 @@ export const WEB_URI =
 export const MESSAGE_HANDLER_URL = `https://${WEB_URI}/api/send`;
 export const MESSAGE_RECEIVER_PATH = `/api/receive`;
 export const MESSAGE_RECEIVER_URL = `https://${WEB_URI}${MESSAGE_RECEIVER_PATH}`;
-export const LINK_HANDLER_URL = `https://${WEB_URI}/link`;
+export const LINK_HANDLER_URL = `https://${WEB_URI}${LINK_PATH}`;
