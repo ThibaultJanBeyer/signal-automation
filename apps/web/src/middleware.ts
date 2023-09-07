@@ -48,7 +48,7 @@ const isRegistered = async (userId: string) => {
   await redis.set(
     `isRegistered_${userId}`,
     isRegistered,
-    isRegistered ? {} : { ex: 25 },
+    isRegistered ? { ex: 60 * 60 * 24 } : { ex: 25 },
   );
   return isRegistered;
 };
