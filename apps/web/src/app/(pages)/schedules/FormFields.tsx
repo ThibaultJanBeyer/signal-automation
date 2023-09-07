@@ -24,7 +24,7 @@ import { CronPicker } from "@/components/CronPicker";
 export type FormData = {
   name: string;
   messages: { value?: string }[];
-  attachments: { value?: string }[];
+  images: { value?: string }[];
   stickers: { value?: string }[];
   recipients: { value: string }[];
   luck: string;
@@ -89,9 +89,9 @@ export default function FormFields({ onSubmit, data, children }: Props) {
           label="Message(s) (one, randomly selected):"
         />
         <MultiFormField
-          name="attachments"
+          name="images"
           form={form}
-          label="Attachment(s) (one, randomly selected, base64 encoded):"
+          label="URL(s) to Images (one, randomly selected):"
         />
         <MultiFormField
           name="stickers"
@@ -161,7 +161,7 @@ const MultiFormField = <T extends keyof FormData>({
       <>
         {name === "stickers" && values.length > 0 && (
           <p className="text-orange-400">
-            Note: for stickers to work, remove messages and attachments.
+            Note: for stickers to work, remove messages and images.
           </p>
         )}
         {fields.map((field, index) => {
@@ -177,12 +177,12 @@ const MultiFormField = <T extends keyof FormData>({
                 className={cn(
                   "grid",
                   index === fields.length - 1 ? "" : "mb-2",
-                  name === "attachments"
+                  name === "images"
                     ? "grid-cols-[auto_1fr_auto]"
                     : "grid-cols-[1fr_auto]",
                 )}
               >
-                {name === "attachments" && (
+                {name === "images" && (
                   <img src={values[index].value} alt="" className="h-10 w-10" />
                 )}
                 <Form.Control asChild>
@@ -227,9 +227,9 @@ const schema = {
       value: zod.string().nonempty({ message: "Message(s) is required" }),
     }),
   ),
-  attachments: zod.array(
+  images: zod.array(
     zod.object({
-      value: zod.string().nonempty({ message: "attachments(s) is required" }),
+      value: zod.string().nonempty({ message: "images(s) is required" }),
     }),
   ),
   stickers: zod.array(
@@ -261,9 +261,9 @@ const getDefaultValues = (data?: FormData): FormData => ({
     data?.scheduleCron ||
     `30 8 * * * {${Intl.DateTimeFormat().resolvedOptions().timeZone}}`,
   scheduleDelay: data?.scheduleDelay || `1`,
-  messages: data?.messages || [{ value: "Hi 👋" }],
+  messages: data?.messages || [],
   luck: data?.luck || `100`,
-  attachments: data?.attachments || [],
+  images: data?.images || [],
   stickers: data?.stickers || [],
   recipients: data?.recipients || [{ value: "+4917645708000" }],
 });

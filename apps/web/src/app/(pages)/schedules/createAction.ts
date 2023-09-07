@@ -21,6 +21,21 @@ export async function createAction(data: FormData) {
   const stringified = JSON.stringify(data);
   const body = lz.compressToUTF16(stringified);
 
+  if (data.messages[0]?.value?.includes("test_direct_")) {
+    const resp = await fetch("http://localhost:3000/api/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Auth: process.env.SERVER_TOKEN!,
+        UserId: userId,
+      },
+      credentials: "include",
+      body: JSON.stringify({ body }),
+    });
+    if (!resp.ok) throw new Error(`Error creating schedule ${resp.statusText}`);
+    return;
+  }
+
   const resp = await fetch(`${UPSTASH_PUBLISH_URI}/${MESSAGE_HANDLER_URL}`, {
     method: "POST",
     headers: {

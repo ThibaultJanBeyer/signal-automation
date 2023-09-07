@@ -11,6 +11,14 @@ export async function GET() {
   return new NextResponse("Hello world!");
 }
 
+async function fetchAndEncodeImage(url: string): Promise<string> {
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const base64data = buffer.toString("base64");
+  return `${base64data}`;
+}
+
 export async function POST(req: Request) {
   const auth = req.headers.get("Auth");
   const userId = req.headers.get("UserId");
@@ -27,14 +35,22 @@ export async function POST(req: Request) {
 
   const msg = getRandomItemFromArray(body.messages)?.value;
   const stkr = getRandomItemFromArray(body.stickers)?.value;
-  const att = getRandomItemFromArray(body.attachments)?.value;
-  const shouldSend = isSelected(Number(body.luck));
-  if (!shouldSend) return new NextResponse("Not sending", { status: 200 });
+  const img = getRandomItemFromArray(body.images)?.value;
+  const shouldSend = Boolean(
+    isSelected(Number(body.luck)) && (msg || stkr || img),
+  );
+  if (!shouldSend)
+    return new NextResponse(
+      `Not sending ${body.luck} – ${msg || stkr || img}`,
+      {
+        status: 200,
+      },
+    );
 
   const message = {
     ...(msg ? { message: msg } : {}),
     ...(stkr ? { sticker: stkr } : {}),
-    ...(att ? { base64_attachments: att } : {}),
+    ...(img ? { base64_attachments: [await fetchAndEncodeImage(img)] } : {}),
     number: user?.phoneNumber,
     recipients: body.recipients.map((r) => r.value),
   };
