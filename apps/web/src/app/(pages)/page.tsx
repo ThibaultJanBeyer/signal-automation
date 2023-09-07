@@ -9,11 +9,14 @@ export default function Home() {
     <main className="w-full px-16 py-10">
       Welcome. If you have any issues or something does not seem to work, try
       re-linking your number:{" "}
-      <Button asChild variant="outline">
-        <Link href={`${LINK_PATH}`}>Link Number</Link>
-      </Button>
+      <Link href={`${LINK_PATH}`} className="underline">
+        Link Number
+      </Link>{" "}
       If the issue still persists, please open an issue on{" "}
-      <Link href="https://github.com/ThibaultJanBeyer/signal-automation">
+      <Link
+        href="https://github.com/ThibaultJanBeyer/signal-automation"
+        className="underline"
+      >
         GitHub
       </Link>
     </main>

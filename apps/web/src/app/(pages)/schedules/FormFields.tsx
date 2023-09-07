@@ -27,7 +27,7 @@ export type FormData = {
   attachments: { value?: string }[];
   stickers: { value?: string }[];
   recipients: { value: string }[];
-  attachmentsLuck: string;
+  luck: string;
   scheduleCron: string;
   scheduleDelay: string;
 };
@@ -45,7 +45,6 @@ export default function FormFields({ onSubmit, data, children }: Props) {
     defaultValues: getDefaultValues(data),
   });
 
-  const attachments = form.watch("attachments");
   const errors = form.formState.errors;
 
   return (
@@ -94,25 +93,18 @@ export default function FormFields({ onSubmit, data, children }: Props) {
           form={form}
           label="Attachment(s) (one, randomly selected, base64 encoded):"
         />
-        {attachments.length > 0 && (
-          <FormField
-            name="attachmentsLuck"
-            errors={errors}
-            label="How often should an attachment be picked? (0–100%)"
-          >
-            <Input
-              {...form.register("attachmentsLuck")}
-              type="number"
-              min={0}
-              max={100}
-            />
-          </FormField>
-        )}
         <MultiFormField
           name="stickers"
           form={form}
           label="Stickers(s) (one, randomly selected):"
         />
+        <FormField
+          name="luck"
+          errors={errors}
+          label="How often should the message be actually send? (0–100%)"
+        >
+          <Input {...form.register("luck")} type="number" min={0} max={100} />
+        </FormField>
         <MultiFormField name="recipients" form={form} label="Recipient(s):" />
         {children}
       </Form.Root>
@@ -167,6 +159,11 @@ const MultiFormField = <T extends keyof FormData>({
   return (
     <FormField name={name} errors={errors} label={label}>
       <>
+        {name === "stickers" && values.length > 0 && (
+          <p className="text-orange-400">
+            Note: for stickers to work, remove messages and attachments.
+          </p>
+        )}
         {fields.map((field, index) => {
           return (
             <React.Fragment key={field.id}>
@@ -253,9 +250,7 @@ const schema = {
       }),
     )
     .nonempty({ message: "Recipient(s) are required" }),
-  attachmentsLuck: zod
-    .string()
-    .nonempty({ message: "attachmentsLuck required" }),
+  luck: zod.string().nonempty({ message: "luck required" }),
   scheduleCron: zod.string().nonempty({ message: "Schedule is required" }),
   scheduleDelay: zod.string().nonempty({ message: "Delay is required" }),
 };
@@ -267,7 +262,7 @@ const getDefaultValues = (data?: FormData): FormData => ({
     `30 8 * * * {${Intl.DateTimeFormat().resolvedOptions().timeZone}}`,
   scheduleDelay: data?.scheduleDelay || `1`,
   messages: data?.messages || [{ value: "Hi 👋" }],
-  attachmentsLuck: data?.attachmentsLuck || `100`,
+  luck: data?.luck || `100`,
   attachments: data?.attachments || [],
   stickers: data?.stickers || [],
   recipients: data?.recipients || [{ value: "+4917645708000" }],

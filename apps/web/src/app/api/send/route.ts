@@ -27,9 +27,10 @@ export async function POST(req: Request) {
 
   const msg = getRandomItemFromArray(body.messages)?.value;
   const stkr = getRandomItemFromArray(body.stickers)?.value;
-  const att = isSelected(Number(body.attachmentsLuck))
-    ? getRandomItemFromArray(body.attachments)?.value
-    : undefined;
+  const att = getRandomItemFromArray(body.attachments)?.value;
+  const shouldSend = isSelected(Number(body.luck));
+  if (!shouldSend) return new NextResponse("Not sending", { status: 200 });
+
   const message = {
     ...(msg ? { message: msg } : {}),
     ...(stkr ? { sticker: stkr } : {}),
