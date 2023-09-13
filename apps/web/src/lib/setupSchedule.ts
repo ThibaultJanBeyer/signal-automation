@@ -1,10 +1,11 @@
+// @todo move this into a cloudflare worker
 import {
   MESSAGE_RECEIVER_URL,
   UPSTASH_PUBLISH_URI,
   UPSTASH_SCHEDULES_URI,
 } from "@sa/utils/src/constants";
 
-import { Schedule } from "@/app/(pages)/schedules/page";
+import { type Schedule } from "@/app/(pages)/schedules/_actions/getSchedules";
 
 let isRunning = false;
 
@@ -26,7 +27,7 @@ export const setupSchedule = async () => {
 
   if (receiveSchedulesIds.length > 0) {
     await Promise.all(
-      receiveSchedulesIds.map(async (id, index) => {
+      receiveSchedulesIds.map(async (id) => {
         const res = await fetch(`${UPSTASH_SCHEDULES_URI}/${id}`, {
           method: "DELETE",
           headers: {
@@ -34,7 +35,8 @@ export const setupSchedule = async () => {
             Authorization: `Bearer ${process.env.UPSTASH_TOKEN}`,
           },
         });
-        const result = await res.json();
+        if (!res.ok)
+          throw new Error(`Error deleting schedule ${res.statusText}`);
         console.log(`Deleted schedule ${id}`);
       }),
     );
