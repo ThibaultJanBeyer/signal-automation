@@ -16,20 +16,23 @@ const schema = {
 };
 
 export default function LuckField(data: RemoteFormData) {
-  const { _id, luck } = data;
-  const onSubmit = ({ luck }: { luck: string }) => {
-    startTransition(() => {
-      updateAction({ ...data, luck }).catch((error) => {
-        console.log("error", error);
-      });
-    });
-  };
+  const { luck } = data;
 
   const form = useForm({
     resolver: zodResolver(zod.object(schema).strict()),
     mode: "onChange",
     defaultValues: { luck },
   });
+
+  const onSubmit = ({ luck }: { luck: string }) => {
+    startTransition(() => {
+      updateAction({ ...data, luck })
+        .then(() => form.reset())
+        .catch((error) => {
+          console.log("error", error);
+        });
+    });
+  };
 
   const errors = form.formState.errors;
 

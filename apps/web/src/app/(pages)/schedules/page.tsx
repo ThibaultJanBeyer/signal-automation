@@ -28,12 +28,12 @@ export default async function StandupList() {
         </Button>
       </div>
       <Table>
-        <TableCaption>A list of your workspaces standups.</TableCaption>
+        <TableCaption>A list of your automation.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
             <TableHead>Cron</TableHead>
-            <TableHead>Created At</TableHead>
+            <TableHead>Last changed</TableHead>
             <TableHead>Recipients</TableHead>
             <TableHead>Luck</TableHead>
             <TableHead>Action</TableHead>
