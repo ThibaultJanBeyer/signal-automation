@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition } from "react";
+import { startTransition, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Form from "@radix-ui/react-form";
 import { FormProvider, useForm } from "react-hook-form";
@@ -18,6 +18,8 @@ const schema = {
 export default function LuckField(data: RemoteFormData) {
   const { luck } = data;
 
+  const [loading, isLoading] = useState(false);
+
   const form = useForm({
     resolver: zodResolver(zod.object(schema).strict()),
     mode: "onChange",
@@ -25,11 +27,16 @@ export default function LuckField(data: RemoteFormData) {
   });
 
   const onSubmit = ({ luck }: { luck: string }) => {
+    isLoading(true);
     startTransition(() => {
       updateAction({ ...data, luck })
-        .then(() => form.reset())
+        .then(() => {
+          isLoading(false);
+          form.reset();
+        })
         .catch((error) => {
           console.log("error", error);
+          isLoading(false);
         });
     });
   };
@@ -51,6 +58,7 @@ export default function LuckField(data: RemoteFormData) {
         ) : null}
         <Input
           {...form.register("luck", { valueAsNumber: true })}
+          disabled={loading}
           type="number"
           min={0}
           max={100}
