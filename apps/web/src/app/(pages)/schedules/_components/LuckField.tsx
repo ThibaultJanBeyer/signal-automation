@@ -25,6 +25,7 @@ export default function LuckField(data: RemoteFormData) {
     mode: "onChange",
     defaultValues: { luck },
   });
+  form.reset();
 
   const onSubmit = ({ luck }: { luck: string }) => {
     isLoading(true);
@@ -32,7 +33,6 @@ export default function LuckField(data: RemoteFormData) {
       updateAction({ ...data, luck })
         .then(() => {
           isLoading(false);
-          form.reset();
         })
         .catch((error) => {
           console.log("error", error);
