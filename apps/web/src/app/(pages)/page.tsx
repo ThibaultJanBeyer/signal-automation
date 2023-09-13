@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 
-import { Button } from "@sa/ui/button";
 import { LINK_PATH } from "@sa/utils/src/constants";
 
 export default function Home() {

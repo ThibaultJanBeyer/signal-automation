@@ -29,6 +29,7 @@
     "COMMUNICATION_TOKEN",
     "KEY",
     "UPSTASH_TOKEN",
-    "SERVER_TOKEN"
+    "SERVER_TOKEN",
+    "UPSTASH_REDIS_TOKEN"
   ]
 }

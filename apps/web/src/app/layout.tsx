@@ -1,12 +1,12 @@
 import "@/styles/globals.css";
 
 import React from "react";
-import { Metadata } from "next";
+import { type Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 
 import { cn } from "@sa/ui/utils";
 
 import { fontSans } from "@/lib/fonts";
-import { ClerkProvider } from '@clerk/nextjs'
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -52,17 +52,14 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-      </head>
+      <head></head>
       <body
         className={cn(
           "flex min-h-screen flex-col overflow-x-hidden bg-background font-sans antialiased ",
           fontSans.variable,
         )}
       >
-        <ClerkProvider>
-          {children}
-        </ClerkProvider>
+        <ClerkProvider>{children}</ClerkProvider>
       </body>
     </html>
   );

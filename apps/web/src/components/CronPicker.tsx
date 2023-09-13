@@ -1,12 +1,13 @@
 "use-client";
 
 import { useState } from "react";
+import { useWatch, type UseFormRegisterReturn } from "react-hook-form";
+import { Cron } from "react-js-cron";
+
 import { Button } from "@sa/ui/button";
 import { Edit3Icon } from "@sa/ui/icons";
 import { Input } from "@sa/ui/input";
 import { parseCustomCronString } from "@sa/utils/src/parseCustomCronString";
-import { UseFormRegisterReturn, useWatch } from "react-hook-form";
-import { Cron } from "react-js-cron";
 
 type Props = {
   registered: UseFormRegisterReturn<string>;

@@ -26,7 +26,9 @@ export function typedObjectKeys<T extends object>(object: T) {
   return Object.keys(object) as (keyof typeof object)[];
 }
 
-export function removeEmpty<T extends any>(obj: T): T | undefined {
+export function removeEmpty<
+  T extends Record<string, any> | undefined | unknown,
+>(obj: T): T | undefined {
   return Object.fromEntries(
     Object.entries(obj || {})
       .filter(([_, v]) => {

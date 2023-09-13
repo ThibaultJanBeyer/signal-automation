@@ -1,7 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  auth,
   SignedIn,
   SignedOut,
   SignInButton,
@@ -17,7 +16,6 @@ import {
 } from "@sa/utils/src/constants";
 
 export function SiteHeader() {
-  const { userId } = auth();
   return (
     <>
       <header className="pointer-events-none fixed top-0 z-40 w-full">
