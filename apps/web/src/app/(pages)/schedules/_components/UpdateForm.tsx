@@ -8,10 +8,10 @@ import { Button } from "@sa/ui/button";
 import { type RemoteFormData } from "../_actions/getSchedules";
 import { updateAction } from "../_actions/updateAction";
 import DeleteButton from "./DeleteButton";
-import StandupsFormFields, { type FormData } from "./FormFields";
+import StandupsFormFields, { type XFormData } from "./FormFields";
 
 export const UpdateForm = ({ data: remoteData }: { data: RemoteFormData }) => {
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (data: XFormData) => {
     startTransition(() => {
       updateAction({ ...remoteData, ...data }).catch((error) => {
         console.log("error", error);

@@ -4,7 +4,7 @@ import lz from "lz-string";
 import { SERVER_POST_URI, UPSTASH_PUBLISH_URI } from "@sa/utils/src/constants";
 import { getRandomItemFromArray, isSelected } from "@sa/utils/src/random";
 
-import { type FormData } from "@/app/(pages)/schedules/_components/FormFields";
+import { type XFormData } from "@/app/(pages)/schedules/_components/FormFields";
 import { getUser } from "@/lib/getUser";
 
 export async function GET() {
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     return new NextResponse("Missing Auth", { status: 401 });
 
   const decompressed = lz.decompressFromUTF16(json.body);
-  const body: FormData = JSON.parse(decompressed);
+  const body: XFormData = JSON.parse(decompressed);
 
   const msg = getRandomItemFromArray(body.messages)?.value;
   const stkr = getRandomItemFromArray(body.stickers)?.value;

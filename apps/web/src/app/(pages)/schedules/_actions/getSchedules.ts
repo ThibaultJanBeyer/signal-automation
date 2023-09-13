@@ -6,7 +6,7 @@ import { UPSTASH_SCHEDULES_URI } from "@sa/utils/src/constants";
 
 import { redis } from "@/lib/redis";
 
-import { type FormData } from "../_components/FormFields";
+import { type XFormData } from "../_components/FormFields";
 
 export type Schedule = {
   scheduleId: string;
@@ -20,7 +20,7 @@ export type Schedule = {
   settings: { retries: 3 };
 };
 
-export type RemoteFormData = { _id: string; createdAt: number } & FormData;
+export type RemoteFormData = { _id: string; createdAt: number } & XFormData;
 
 export const getAllSchedules = async (): Promise<RemoteFormData[] | null> => {
   const { userId } = await auth();

@@ -7,13 +7,13 @@ import { Button } from "@sa/ui/button";
 import { SCHEDULES_PATH } from "@sa/utils/src/constants";
 
 import { createAction } from "../_actions/createAction";
-import FormFields, { FormData } from "../_components/FormFields";
+import FormFields, { type XFormData } from "../_components/FormFields";
 
 export default function Page() {
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (data: XFormData) => {
     startTransition(() => {
       createAction(data)
-        .then((ok) => (location.href = SCHEDULES_PATH))
+        .then(() => (location.href = SCHEDULES_PATH))
         .catch((error) => {
           console.log("error", error);
         });

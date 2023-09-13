@@ -20,7 +20,7 @@ import { cn } from "@sa/ui/utils";
 
 import { CronPicker } from "@/components/CronPicker";
 
-export type FormData = {
+export type XFormData = {
   name: string;
   messages: { value?: string }[];
   images: { value?: string }[];
@@ -32,9 +32,9 @@ export type FormData = {
 };
 
 type Props = {
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: XFormData) => void;
   children: React.ReactNode;
-  data?: FormData;
+  data?: XFormData;
 };
 
 export default function FormFields({ onSubmit, data, children }: Props) {
@@ -121,7 +121,7 @@ export default function FormFields({ onSubmit, data, children }: Props) {
   );
 }
 
-const FormField = <T extends keyof FormData>({
+const FormField = <T extends keyof XFormData>({
   name,
   label,
   errors,
@@ -129,7 +129,7 @@ const FormField = <T extends keyof FormData>({
 }: {
   name: T;
   label: React.ReactNode;
-  errors: FieldErrors<FormData>;
+  errors: FieldErrors<XFormData>;
   children: React.ReactNode;
 }) => {
   const error = errors[name]?.message;
@@ -148,13 +148,13 @@ const FormField = <T extends keyof FormData>({
   );
 };
 
-const MultiFormField = <T extends keyof FormData>({
+const MultiFormField = <T extends keyof XFormData>({
   name,
   label,
   form,
 }: {
   name: T;
-  form: UseFormReturn<FormData, any, undefined>;
+  form: UseFormReturn<XFormData, any, undefined>;
   label: React.ReactNode;
 }) => {
   const { fields, append, remove } = useFieldArray({
@@ -272,7 +272,7 @@ const schema = {
   scheduleDelay: zod.number().min(0).max(300),
 };
 
-const getDefaultValues = (data?: FormData): FormData => ({
+const getDefaultValues = (data?: XFormData): XFormData => ({
   name: data?.name || "My Schedule",
   scheduleCron:
     data?.scheduleCron ||

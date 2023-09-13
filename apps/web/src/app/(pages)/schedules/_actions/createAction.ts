@@ -11,10 +11,10 @@ import { parseCustomCronString } from "@sa/utils/src/parseCustomCronString";
 
 import { redis } from "@/lib/redis";
 
-import { type FormData } from "../_components/FormFields";
+import { type XFormData } from "../_components/FormFields";
 import { type RemoteFormData } from "./getSchedules";
 
-export async function createAction(data: FormData & RemoteFormData) {
+export async function createAction(data: XFormData | RemoteFormData) {
   const { userId } = await auth();
   if (!userId) return null;
 
