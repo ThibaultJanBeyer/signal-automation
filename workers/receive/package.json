@@ -1,0 +1,15 @@
+{
+  "name": "@workers/receive",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev --port 8789 --env dev",
+    "clean": "rm -rf .turbo .wrangler node_modules"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230814.0",
+    "typescript": "^5.2.2",
+    "wrangler": "^3.5.1"
+  }
+}

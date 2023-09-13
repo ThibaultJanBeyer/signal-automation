@@ -5,12 +5,11 @@ import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Form from "@radix-ui/react-form";
 import {
-  FieldErrors,
   FormProvider,
-  SubmitHandler,
   useFieldArray,
   useForm,
-  UseFormReturn,
+  type FieldErrors,
+  type UseFormReturn,
 } from "react-hook-form";
 import * as zod from "zod";
 
@@ -33,7 +32,7 @@ export type FormData = {
 };
 
 type Props = {
-  onSubmit: SubmitHandler<FormData>;
+  onSubmit: (data: FormData) => void;
   children: React.ReactNode;
   data?: FormData;
 };
@@ -81,7 +80,12 @@ export default function FormFields({ onSubmit, data, children }: Props) {
             </>
           }
         >
-          <Input {...form.register("scheduleDelay")} type="number" />
+          <Input
+            {...form.register("scheduleDelay", { valueAsNumber: true })}
+            type="number"
+            min={0}
+            max={300}
+          />
         </FormField>
         <MultiFormField
           name="messages"
@@ -103,7 +107,12 @@ export default function FormFields({ onSubmit, data, children }: Props) {
           errors={errors}
           label="How often should the message be actually send? (0–100%)"
         >
-          <Input {...form.register("luck")} type="number" min={0} max={100} />
+          <Input
+            {...form.register("luck", { valueAsNumber: true })}
+            type="number"
+            min={0}
+            max={100}
+          />
         </FormField>
         <MultiFormField name="recipients" form={form} label="Recipient(s):" />
         {children}
@@ -159,7 +168,7 @@ const MultiFormField = <T extends keyof FormData>({
   return (
     <FormField name={name} errors={errors} label={label}>
       <>
-        {name === "stickers" && (
+        {name === "stickers" && Boolean(values.length) && (
           <>
             <p className="text-orange-400">
               Note: for stickers to work, remove messages and images.
@@ -258,9 +267,9 @@ const schema = {
       }),
     )
     .nonempty({ message: "Recipient(s) are required" }),
-  luck: zod.string().nonempty({ message: "luck required" }),
+  luck: zod.number().min(0).max(100),
   scheduleCron: zod.string().nonempty({ message: "Schedule is required" }),
-  scheduleDelay: zod.string().nonempty({ message: "Delay is required" }),
+  scheduleDelay: zod.number().min(0).max(300),
 };
 
 const getDefaultValues = (data?: FormData): FormData => ({

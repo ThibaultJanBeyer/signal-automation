@@ -1,8 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs";
-import lz from "lz-string";
 
 import { Button } from "@sa/ui/button";
 import {
@@ -16,49 +13,12 @@ import {
 } from "@sa/ui/table";
 import { parseCustomCronString } from "@sa/utils/src/parseCustomCronString";
 
-import { redis } from "@/lib/redis";
-
-import { FormData } from "./FormFields";
-
-export type Schedule = {
-  scheduleId: string;
-  cron: string;
-  createdAt: number;
-  content: {
-    header: { [key: string]: string };
-    body: string; // JWT body
-  };
-  destination: { type: string; url: string };
-  settings: { retries: 3 };
-};
-
-const getData = async (): Promise<
-  ({ _id: string; createdAt: string } & FormData)[]
-> => {
-  const { userId } = await auth();
-  if (!userId) return redirect("/");
-  const schedules = (await redis.get(`schedules_${userId}`)) as {
-    [key: string]: {
-      createdAt: string;
-      cron: string;
-      body: string;
-    };
-  };
-  const items = Object.keys(schedules || {}).map((id) => {
-    const schedule = schedules![id]!;
-    const decompressed = lz.decompressFromUTF16(schedule.body);
-    return {
-      _id: id,
-      createdAt: schedule.createdAt,
-      cron: schedule.cron,
-      ...JSON.parse(decompressed),
-    };
-  });
-  return items;
-};
+import { getAllSchedules } from "./_actions/getSchedules";
+import DeleteButton from "./_components/DeleteButton";
+import LuckField from "./_components/LuckField";
 
 export default async function StandupList() {
-  const data = await getData();
+  const data = await getAllSchedules();
 
   return (
     <main className="mx-auto w-full max-w-5xl">
@@ -75,11 +35,13 @@ export default async function StandupList() {
             <TableHead>Cron</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Recipients</TableHead>
+            <TableHead>Luck</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map(({ name, scheduleCron, createdAt, recipients, _id }) => {
+          {data?.map((schedule) => {
+            const { name, scheduleCron, createdAt, recipients, _id } = schedule;
             const date = new Date(createdAt);
             const { cron } = parseCustomCronString(scheduleCron);
             return (
@@ -93,11 +55,17 @@ export default async function StandupList() {
                 <TableCell>{date.toLocaleString()}</TableCell>
                 <TableCell>{recipients.map((v) => v.value)}</TableCell>
                 <TableCell>
-                  <Button asChild>
-                    <Link href={`/schedules/${_id}`} className="block">
-                      Open
-                    </Link>
-                  </Button>
+                  <LuckField {...schedule} />
+                </TableCell>
+                <TableCell>
+                  <div>
+                    <Button asChild>
+                      <Link href={`/schedules/${_id}`} className="block">
+                        Open
+                      </Link>
+                    </Button>
+                    <DeleteButton _id={_id} />
+                  </div>
                 </TableCell>
               </TableRow>
             );

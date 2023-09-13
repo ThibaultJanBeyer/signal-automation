@@ -1,49 +1,28 @@
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs";
-import lz from "lz-string";
 
 import { Skeleton } from "@sa/ui/skeleton";
-import { UPSTASH_SCHEDULES_URI } from "@sa/utils/src/constants";
+import { SCHEDULES_PATH } from "@sa/utils/src/constants";
 
-import { FormData } from "../FormFields";
-import { Schedule } from "../page";
-import { UpdateForm } from "./UpdateForm";
-
-const getData = async (id: string): Promise<FormData | null> => {
-  const { userId } = await auth();
-  if (!userId) return redirect("/");
-  const res = await fetch(`${UPSTASH_SCHEDULES_URI}/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.UPSTASH_TOKEN}`,
-    },
-  });
-  const data: Schedule = await res.json();
-  if (!data || (data as any)?.error) {
-    console.error((data as any)?.error);
-    return null;
-  }
-  const buffer = Buffer.from(data.content.body, "base64").toString();
-  const decompressed = lz.decompressFromUTF16(JSON.parse(buffer).body);
-  const body: FormData = JSON.parse(decompressed);
-  return body;
-};
+import { getSchedule } from "../_actions/getSchedules";
+import { UpdateForm } from "../_components/UpdateForm";
 
 export default async function Page({
   params: { id },
 }: {
   params: { id: string };
 }) {
-  const data = await getData(id);
-  if (!data) return "Not Found";
+  const data = await getSchedule(id);
+  if (!data) {
+    console.info("not found", id);
+    return redirect(SCHEDULES_PATH);
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-10">
       <div>
         <h1 className="mb-10 text-center text-lg">{"Update" || "loading…"}</h1>
         {data ? (
-          <UpdateForm id={id} data={data} />
+          <UpdateForm data={data} />
         ) : (
           <>
             <Skeleton className="w-full" />

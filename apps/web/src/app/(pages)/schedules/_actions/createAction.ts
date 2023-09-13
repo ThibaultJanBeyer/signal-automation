@@ -11,13 +11,14 @@ import { parseCustomCronString } from "@sa/utils/src/parseCustomCronString";
 
 import { redis } from "@/lib/redis";
 
-import { type FormData } from "./FormFields";
+import { type FormData } from "../_components/FormFields";
+import { type RemoteFormData } from "./getSchedules";
 
-export async function createAction(data: FormData) {
+export async function createAction(data: FormData & RemoteFormData) {
   const { userId } = await auth();
   if (!userId) return null;
 
-  const { cron, timeZone } = parseCustomCronString(data.scheduleCron);
+  const { cron } = parseCustomCronString(data.scheduleCron);
   const stringified = JSON.stringify(data);
   const body = lz.compressToUTF16(stringified);
 
@@ -51,15 +52,7 @@ export async function createAction(data: FormData) {
   if (!resp.ok) throw new Error(`Error creating schedule ${resp.statusText}`);
   const result = await resp.json();
 
-  const prev = (await redis.get(`schedules_${userId}`)) as any;
-  await redis.set(`schedules_${userId}`, {
-    ...prev,
-    [result.scheduleId]: {
-      cron,
-      createdAt: new Date().toISOString(),
-      body: `${body}`,
-    },
-  });
-
-  // redirect in here is broken
+  const prev: string[] = (await redis.get(`schedules_${userId}`)) || [];
+  prev.push(result.scheduleId);
+  await redis.set(`schedules_${userId}`, prev);
 }

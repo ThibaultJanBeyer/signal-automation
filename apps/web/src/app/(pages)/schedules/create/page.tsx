@@ -1,5 +1,3 @@
-// @TODO: fix issue with bot login
-
 "use client";
 
 import { startTransition } from "react";
@@ -8,8 +6,8 @@ import { Submit } from "@radix-ui/react-form";
 import { Button } from "@sa/ui/button";
 import { SCHEDULES_PATH } from "@sa/utils/src/constants";
 
-import { createAction } from "../createAction";
-import FormFields, { FormData } from "../FormFields";
+import { createAction } from "../_actions/createAction";
+import FormFields, { FormData } from "../_components/FormFields";
 
 export default function Page() {
   const onSubmit = (data: FormData) => {

@@ -4,7 +4,7 @@ import lz from "lz-string";
 import { SERVER_POST_URI, UPSTASH_PUBLISH_URI } from "@sa/utils/src/constants";
 import { getRandomItemFromArray, isSelected } from "@sa/utils/src/random";
 
-import { FormData } from "@/app/(pages)/schedules/FormFields";
+import { type FormData } from "@/app/(pages)/schedules/_components/FormFields";
 import { getUser } from "@/lib/getUser";
 
 export async function GET() {

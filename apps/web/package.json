@@ -12,35 +12,35 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.23.2",
-    "@hookform/resolvers": "^3.2.0",
+    "@clerk/nextjs": "^4.23.5",
+    "@hookform/resolvers": "^3.3.1",
     "@next/bundle-analyzer": "^13.4.19",
     "@radix-ui/react-form": "^0.0.3",
     "@sa/ui": "workspace:*",
     "@sa/utils": "workspace:*",
     "@upstash/redis": "^1.22.0",
     "dotenv-cli": "^7.3.0",
-    "framer-motion": "^10.16.0",
+    "framer-motion": "^10.16.4",
     "lz-string": "^1.5.0",
     "next": "13.4.19",
     "react": "^18.2.0",
     "react-dom": "18.2.0",
-    "react-hook-form": "^7.45.4",
+    "react-hook-form": "^7.46.1",
     "react-js-cron": "^4.1.0",
     "react-select": "^5.7.4",
     "react-timezone-select": "^2.1.2",
     "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.9",
-    "@types/node": "20.5.1",
-    "@types/react": "^18.2.20",
+    "@tailwindcss/typography": "^0.5.10",
+    "@types/node": "20.6.0",
+    "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
     "autoprefixer": "10.4.15",
     "eslint": "^8.47.0",
     "eslint-config-next": "^13.4.19",
-    "postcss": "8.4.28",
+    "postcss": "8.4.29",
     "tailwindcss": "3.3.3",
-    "typescript": "^5.1.6"
+    "typescript": "^5.2.2"
   }
 }
