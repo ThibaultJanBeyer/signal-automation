@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
   const message = {
     ...(msg ? { message: msg } : {}),
-    ...(stkr ? { sticker: stkr } : {}),
+    ...(stkr ? { sticker: pickStickerFromStkrString(stkr) } : {}),
     ...(img ? { base64_attachments: [await fetchAndEncodeImage(img)] } : {}),
     number: user?.phoneNumber,
     recipients: body.recipients.map((r) => r.value),
@@ -74,3 +74,16 @@ export async function POST(req: Request) {
     return new NextResponse("Error", { status: 500 });
   }
 }
+
+/**
+ * Given a sticker input i.e. "packId:1-10", return a random sticker from that range i.e. "packId:5"
+ * If no range is provided, default to "packId:1" or the number provided if any
+ */
+const pickStickerFromStkrString = (stickerUri: string) => {
+  const [packId, range = "1"] = stickerUri.split(":");
+  const [min, max] = range.split("-");
+  const minNum = Number(min) || 1;
+  const maxNum = Number(max) || minNum;
+  const random = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+  return `${packId}:${random}`;
+};

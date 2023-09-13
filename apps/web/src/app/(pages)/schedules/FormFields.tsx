@@ -159,10 +159,18 @@ const MultiFormField = <T extends keyof FormData>({
   return (
     <FormField name={name} errors={errors} label={label}>
       <>
-        {name === "stickers" && values.length > 0 && (
-          <p className="text-orange-400">
-            Note: for stickers to work, remove messages and images.
-          </p>
+        {name === "stickers" && (
+          <>
+            <p className="text-orange-400">
+              Note: for stickers to work, remove messages and images.
+            </p>
+            <p>
+              The format is <em>fe4947796aab26324240fece95824d3e:1-10</em> while
+              fe4947796aab26324240fece95824d3e is the sticker pack id and 1-10
+              is the range of stickers to use, or a single number for a specific
+              sticker.
+            </p>
+          </>
         )}
         {fields.map((field, index) => {
           return (
